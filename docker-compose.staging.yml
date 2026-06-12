@@ -1,0 +1,50 @@
+name: studysync-staging
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-studysync}
+      POSTGRES_USER: ${POSTGRES_USER:-studysync}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-studysync} -d ${POSTGRES_DB:-studysync}"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+    volumes:
+      - staging_postgres_data:/var/lib/postgresql/data
+      - ./backups:/backups
+    ports:
+      - "127.0.0.1:${POSTGRES_PORT:-5432}:5432"
+
+  db-migrate:
+    image: node:24-bookworm-slim
+    working_dir: /workspace
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-studysync}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-studysync}
+    volumes:
+      - .:/workspace
+    command: ["sh", "-c", "npm ci && npm run db:pg:migrate && npm run db:pg:check && npm run db:pg:workflow-check"]
+
+  db-backup:
+    image: postgres:17-alpine
+    profiles: ["operations"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      PGPASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - ./backups:/backups
+    command:
+      - sh
+      - -c
+      - pg_dump -h postgres -U ${POSTGRES_USER:-studysync} -d ${POSTGRES_DB:-studysync} -Fc -f /backups/studysync-staging.dump
+
+volumes:
+  staging_postgres_data:

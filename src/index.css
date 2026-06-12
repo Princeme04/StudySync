@@ -1,0 +1,110 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+
+  /* Theme colors matching the StudySync 'Academic Flow' spec */
+  --color-brand-primary: #004ac6;
+  --color-brand-on-primary: #ffffff;
+  --color-brand-primary-container: #2563eb;
+  --color-brand-on-primary-container: #eeefff;
+  
+  --color-brand-secondary: #6b38d4;
+  --color-brand-on-secondary: #ffffff;
+  --color-brand-secondary-container: #8455ef;
+  --color-brand-on-secondary-container: #fffbff;
+
+  --color-brand-surface: #f9f9ff;
+  --color-brand-surface-dim: #cfdaf2;
+  --color-brand-surface-bright: #f9f9ff;
+  --color-brand-surface-lowest: #ffffff;
+  --color-brand-surface-low: #f0f3ff;
+  --color-brand-surface-container: #e7eeff;
+  --color-brand-surface-container-high: #dee8ff;
+  --color-brand-surface-container-highest: #d8e3fb;
+  --color-brand-surface-variant: #d8e3fb;
+  
+  --color-brand-on-surface: #111c2d;
+  --color-brand-on-surface-variant: #434655;
+  --color-brand-outline: #666978;
+  --color-brand-outline-variant: #c3c6d7;
+
+  --color-brand-background: #f9f9ff;
+  --color-brand-on-background: #111c2d;
+
+  --color-brand-error: #ba1a1a;
+  --color-brand-on-error: #ffffff;
+  --color-brand-error-container: #ffdad6;
+}
+
+@layer base {
+  body {
+    background-color: var(--color-brand-background);
+    color: var(--color-brand-on-background);
+    font-family: var(--font-sans);
+  }
+}
+
+@layer utilities {
+  @keyframes studysync-page-enter {
+    from {
+      transform: translateY(10px) scale(0.995);
+    }
+    to {
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  @keyframes studysync-panel-enter {
+    from {
+      transform: translateY(14px);
+    }
+    to {
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes studysync-overlay-enter {
+    from {
+      transform: translateY(8px) scale(0.98);
+    }
+    to {
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  .app-viewport > * {
+    animation: studysync-page-enter 320ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .app-viewport :is(section, article) {
+    animation: studysync-panel-enter 360ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .app-viewport :is(section, article):nth-of-type(2) {
+    animation-delay: 35ms;
+  }
+
+  .app-viewport :is(section, article):nth-of-type(3) {
+    animation-delay: 70ms;
+  }
+
+  .app-viewport :is(section, article):nth-of-type(4) {
+    animation-delay: 105ms;
+  }
+
+  .app-viewport [role="dialog"] {
+    animation: studysync-overlay-enter 220ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .app-viewport > *,
+    .app-viewport :is(section, article),
+    .app-viewport [role="dialog"] {
+      animation: none;
+      transform: none;
+    }
+  }
+}
